@@ -55,11 +55,8 @@ public class MyRedisClient {
             //接收缓存
             byte[] buff = new byte[REPLY_BUFF];
             //读取redis回复
-            int read = in.read(buff);
-            if(read > 0){
-                byte[] reply = new byte[read];
-                System.arraycopy(buff, 0, reply, 0, read);
-                return handleReply(reply);
+            if(in.read(buff) > 0){
+                return handleReply(buff);
             }
         }catch(Exception e){
             e.printStackTrace();
