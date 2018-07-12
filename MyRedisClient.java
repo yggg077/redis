@@ -114,27 +114,18 @@ public class MyRedisClient {
             int end = findRN(reply, 1);
             int replyLength = getInt(reply, 1, end);
             String[] rs = new String[replyLength];
-            String[] split = new String(reply).split("\r\n");
             for(int i = 0; i < replyLength; i++){
-                rs[i] = split[2 * (i + 1)];
+                int dollar = findDollar(reply, end);
+                end = findRN(reply, dollar);
+                int length = getInt(reply, dollar + 1, end);
+                rs[i] = length == -1 ? "-1" : new String(reply, end + 2, length);
             }
             return Arrays.toString(rs);
-//            int end = findRN(reply, 1);
-//            int replyLength = getInt(reply, 1, end);
-//            String[] rs = new String[replyLength];
-//            for(int i = 0; i < replyLength; i++){
-//                int dollar = findDollar(reply, end);
-//                end = findRN(reply, dollar);
-//                int length = getInt(reply, dollar + 1, end);
-//                rs[i] = length == -1 ? "-1" : new String(reply, end + 2, length);
-//            }
-//            return Arrays.toString(rs);
         }else if(first == '$'){
             //批量回复
-            return new String(reply).split("\r\n")[1];
-//            int end = findRN(reply, 1);
-//            int length = getInt(reply, 1, end);
-//            return length == -1 ? "-1" : new String(reply, end + 2, length);
+            int end = findRN(reply, 1);
+            int length = getInt(reply, 1, end);
+            return length == -1 ? "-1" : new String(reply, end + 2, length);
         }else if(first == ':'){
             //整型数字
             int end = findRN(reply, 1);
@@ -162,7 +153,7 @@ public class MyRedisClient {
         return isNeg ? -rs : rs;
     }
 
-    //查找byte数组中的\r\n的位置
+    //在byte数组中，从指定位置开始查找 \r\n 的位置
     private static int findRN(byte[] bytes, int start){
         if(bytes == null || bytes.length == 0 || start >= bytes.length){
             return -1;
@@ -182,7 +173,7 @@ public class MyRedisClient {
         return find ? start : -1;
     }
     
-    //查找byte数组中的$的位置
+    //在byte数组中，从指定位置开始查找 $ 的位置
     private static int findDollar(byte[] bytes, int start){
         if(bytes == null || bytes.length == 0 || start >= bytes.length){
             return -1;
