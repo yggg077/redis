@@ -1,4 +1,4 @@
-package redis.learning;
+package redisLearning;
 
 import java.io.InputStream;
 import java.io.OutputStream;
